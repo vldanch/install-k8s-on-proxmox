@@ -1,0 +1,5 @@
+---
+# roles/ansible-role-cri-o/defaults/main.yml
+# Default variables
+os: "xUbuntu_22.04"
+crio_version: "1.25"

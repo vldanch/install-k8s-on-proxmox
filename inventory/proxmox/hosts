@@ -1,0 +1,18 @@
+
+[kubernetes:children]
+kubemaster
+kubeworker
+
+[kubemaster]
+k8s-master-test-ansible ansible_host=ip_add ansible_port=22
+
+[kubeworker]
+
+k8s-worker-node1-test-ansible ansible_host=ip_add ansible_port=22
+k8s-worker-node2-test-ansible ansible_host=ip_add ansible_port=22
+k8s-worker-node3-test-ansible ansible_host=ip_add ansible_port=22
+k8s-worker-node4-test-ansible ansible_host=ip_add ansible_port=22
+
+
+[kubernetes:vars]
+ansible_python_interpreter=/usr/bin/python3

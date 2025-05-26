@@ -1,0 +1,63 @@
+---
+
+# playbook for installation k8s roles
+
+- name: Run install airflow roles
+  hosts: kubernetes
+  remote_user: user
+  become: True
+  gather_facts: True
+
+  roles:
+    - role: roles/ansible-docker
+      vars:
+        docker__edition: "ce"
+        docker__channel: ["stable"]
+        docker__version: "28.0.4"
+        docker__state: "present"
+        docker__compose_v2_version: "2.34.0"
+        docker__users: ["user"]
+      tags: docker-ce
+      # ansible-playbook -i inventory/proxmox/hosts playbooks/dev/k8s.yml --tags docker-ce
+    - role: roles/ansible-role-cri-o
+      tags: cri-o
+      # ansible-playbook -i inventory/proxmox/hosts playbooks/dev/k8s.yml --tags cri-o
+    - role: roles/ansible-role-kubernetes-geerlingguy #work
+      vars:
+        kubernetes_version: '1.32'
+        kubernetes_role: control_plane
+        kubernetes_kubeadm_init_extra_opts: "--pod-network-cidr=10.244.0.0/16 --cri-socket=unix:///var/run/crio/crio.sock"
+        # kubernetes_kubeadm_init_extra_opts: "--pod-network-cidr=10.244.0.0/16 --cri-socket=unix:///var/run/containerd/containerd.sock"
+        kubernetes_packages:
+        - name: kubelet
+          state: present
+        - name: kubectl
+          state: present
+        - name: kubeadm
+          state: present
+        - name: kubernetes-cni
+          state: present
+      tags: kubernetes-geerlingguy-init-master
+      # ansible-playbook -i inventory/proxmox/hosts playbooks/dev/k8s.yml --limit kubemaster --tags kubernetes-geerlingguy-init-master
+    - role: roles/ansible-role-kubernetes-geerlingguy
+      vars:
+        kubernetes_version: '1.32'
+        kubernetes_role: node
+        kubernetes_packages:
+        - name: kubelet
+          state: present
+        - name: kubectl
+          state: present
+        - name: kubeadm
+          state: present
+        - name: kubernetes-cni
+          state: present
+      tags: kubernetes-geerlingguy-init-worker
+      # JOIN_CMD=$(ansible kubemaster -i inventory/proxmox/hosts -u ssh_user -m command -a "kubeadm token create --print-join-command" | grep -o "kubeadm join.*")
+      # JOIN_CMD="$JOIN_CMD --cri-socket=unix:///var/run/crio/crio.sock"
+      # ansible-playbook -i inventory/proxmox/hosts playbooks/dev/k8s.yml \
+      #   --limit kubeworker \
+      #   --tags kubernetes-geerlingguy-init-worker \
+      #   -e "kubernetes_join_command='$JOIN_CMD'"
+    # - role: roles/ansible-role-longhorn-dependens
+    #   tags: longhorn-dependens

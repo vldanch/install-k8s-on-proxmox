@@ -1,0 +1,18 @@
+---
+# roles/ansible-role-cri-o/meta/main.yml
+galaxy_info:
+  author: Your Name
+  description: Ansible role for installing CRI-O container runtime
+  company: Your Company
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+  galaxy_tags:
+    - containers
+    - cri-o
+    - kubernetes
+
+dependencies: []

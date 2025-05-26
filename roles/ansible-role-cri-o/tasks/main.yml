@@ -1,0 +1,63 @@
+---
+# roles/ansible-role-cri-o/tasks/main.yml
+- name: Set variables
+  ansible.builtin.set_fact:
+    OS: "xUbuntu_22.04"
+    CRIO_VERSION: "1.25"
+
+- name: Download libcontainers stable key
+  ansible.builtin.get_url:
+    url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ OS }}/Release.key"
+    dest: /tmp/libcontainers_stable.key
+
+- name: Add libcontainers stable key
+  ansible.builtin.apt_key:
+    file: /tmp/libcontainers_stable.key
+    state: present
+
+- name: Download CRI-O key
+  ansible.builtin.get_url:
+    url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ CRIO_VERSION }}/{{ OS }}/Release.key"
+    dest: /tmp/crio.key
+
+- name: Add CRI-O key
+  ansible.builtin.apt_key:
+    file: /tmp/crio.key
+    state: present
+
+- name: Add libcontainers stable repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ OS }}/ /"
+    state: present
+    filename: "devel_kubic_libcontainers_stable"
+
+- name: Add CRI-O repository
+  ansible.builtin.apt_repository:
+    repo: "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ CRIO_VERSION }}/{{ OS }}/ /"
+    state: present
+    filename: "devel_kubic_libcontainers_stable_cri-o_{{ CRIO_VERSION }}"
+
+- name: Update apt cache and install CRI-O
+  ansible.builtin.apt:
+    update_cache: yes
+    name:
+      - cri-o
+      - cri-o-runc
+      - cri-tools
+    state: present
+
+- name: Start and enable CRI-O service
+  ansible.builtin.systemd:
+    name: crio
+    state: started
+    enabled: yes
+
+- name: Check CRI-O service status
+  ansible.builtin.command: systemctl status crio
+  register: crio_status
+  changed_when: false
+  ignore_errors: yes
+
+- name: Show CRI-O service status
+  ansible.builtin.debug:
+    var: crio_status.stdout_lines

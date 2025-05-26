@@ -1,0 +1,11 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor
+provisioner: cstor.csi.openebs.io
+parameters:
+  cas-type: cstor
+  cstorPoolCluster: "cstor-disk-pool"
+  replicaCount: "3"
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
