@@ -40,3 +40,11 @@ cd terraform/proxmox
 terraform init
 terraform apply
 ```
+
+## Support
+
+☕ Support my work on coffee: [https://donate.stream/donate_68625552be6ba](https://donate.stream/donate_68625552be6ba)
+
+## Contact
+
+For questions or support, you can reach me on Telegram: [https://t.me/vldanch](https://t.me/vldanch)
